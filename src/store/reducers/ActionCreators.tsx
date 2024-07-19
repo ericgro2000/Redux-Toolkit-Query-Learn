@@ -1,19 +1,22 @@
-import {AppDispatch} from "../store";
+import { AppDispatch, RootState} from "../store";
 import axios from "axios";
 import {IUser} from "../../models/IUser";
-import {userSlice} from "./UserSlice";
+import { AsyncThunk, createAsyncThunk } from "@reduxjs/toolkit";
 
-
-export const fetchUsers = () => async (dispatch: AppDispatch) => {
-    try {
-        dispatch(userSlice.actions.usersFetching())
-        const response = await axios.get<IUser[]>('https://jsonplaceholder.typicode.com/users')
-        dispatch (userSlice.actions.usersFetchingSuccess (response.data))
-     } catch (e) {
-        if (e instanceof Error) {
-            dispatch(userSlice.actions.usersFetchingError(e.message));
-          } else {
-            dispatch(userSlice.actions.usersFetchingError("An unknown error occurred."));
-          }
-    }
+interface AsyncThunkConfig {
+  state: RootState;
+  dispatch: AppDispatch
+  rejectValue: string;
 }
+
+export const fetchUsers: AsyncThunk<IUser[], void, AsyncThunkConfig> = createAsyncThunk<IUser[], void, AsyncThunkConfig>(
+  'user/fetchAll',
+  async (_, thunkAPI) => {
+    try {
+      const response = await axios.get<IUser[]>('https://jsonplaceholder.typicode.com/users');
+      return response.data;
+    } catch (e) {
+      return thunkAPI.rejectWithValue("could not load users");
+    }
+  }
+);
