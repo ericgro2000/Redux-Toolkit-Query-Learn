@@ -5,7 +5,7 @@ import PostItem from "./PostItem";
 
 const PostContainer = () => {
     
-    const {data: posts, error, isLoading, refetch} =  postAPI.useFetchAllPostsQuery(5)
+    const {data: posts, error, isLoading, refetch} = postAPI.useFetchAllPostsQuery(5)
 
     return (
         <div>
